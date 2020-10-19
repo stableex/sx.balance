@@ -1,3 +1,5 @@
 *.out
 *.wasm
 *.abi
+.vscode
+node_modules

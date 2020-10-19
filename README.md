@@ -14,22 +14,25 @@ https://docs.balancer.finance/protocol/index
 // Inputs
 const uint64_t amount_in = 10000;
 const uint64_t reserve_in = 45851931234;
+const uint64_t reserve_weight_in = 50000;
 const uint64_t reserve_out = 125682033533;
+const uint64_t reserve_weight_out = 50000;
 const uint8_t fee = 30;
 
 // Calculation
-const uint64_t out = balancer::get_amount_out( amount_in, reserve_in, reserve_out, fee );
+const uint64_t out = balancer::get_amount_out( amount_in, reserve_in, reserve_weight_in, reserve_out, reserve_weight_out, fee );
 // => 27328
 ```
 
 ## Pseudocode Price Formula
 
 ```c++
-function get_amount_out( amount_in, reserve_in, reserve_out, fee ) {
+function get_amount_out( amount_in, reserve_in, reserve_weight_in, reserve_out, reserve_weight_out, fee ) {
+    weight_ratio = (reserve_weight_in / reserve_weight_out);
     amount_in_with_fee = amount_in * (10000 - fee);
-    numerator = amount_in_with_fee * reserve_out;
-    denominator = reserve_in * 10000 + amount_in_with_fee;
-    amount_out = numerator / denominator;
+    numerator = (reserve_in * 10000) / ((reserve_in * 10000) + amount_in_with_fee)
+    denominator = 1 - (numerator ** weight_ratio);
+    amount_out = reserve_out * denominator;
     return amount_out;
 }
 ```
@@ -48,7 +51,9 @@ Given an input amount of an asset and pair reserves, returns the maximum output 
 
 - `{uint64_t} amount_in` - amount input
 - `{uint64_t} reserve_in` - reserve input
+- `{uint64_t} reserve_weight_in` - reserve input weight
 - `{uint64_t} reserve_out` - reserve output
+- `{uint64_t} reserve_weight_out` - reserve output weight
 - `{uint8_t} [fee=30]` - (optional) trading fee (pips 1/100 of 1%)
 
 ### example
@@ -57,11 +62,13 @@ Given an input amount of an asset and pair reserves, returns the maximum output 
 // Inputs
 const uint64_t amount_in = 10000;
 const uint64_t reserve_in = 45851931234;
+const uint64_t reserve_weight_in = 50000;
 const uint64_t reserve_out = 125682033533;
+const uint64_t reserve_weight_out = 50000;
 const uint8_t fee = 30;
 
 // Calculation
-const uint64_t amount_out = balancer::get_amount_out( amount_in, reserve_in, reserve_out, fee );
+const uint64_t amount_out = balancer::get_amount_out( amount_in, reserve_in, reserve_weight_in, reserve_out, reserve_weight_out );
 // => 27328
 ```
 
@@ -71,9 +78,11 @@ Given an output amount of an asset and pair reserves, returns a required input a
 
 ### params
 
-- `{uint64_t} amount_in` - amount input
+- `{uint64_t} amount_out` - amount input
 - `{uint64_t} reserve_in` - reserve input
+- `{uint64_t} reserve_weight_in` - reserve input weight
 - `{uint64_t} reserve_out` - reserve output
+- `{uint64_t} reserve_weight_out` - reserve output weight
 - `{uint8_t} [fee=30]` - (optional) trading fee (pips 1/100 of 1%)
 
 ### example
@@ -82,11 +91,13 @@ Given an output amount of an asset and pair reserves, returns a required input a
 // Inputs
 const uint64_t amount_out = 27328;
 const uint64_t reserve_in = 45851931234;
+const uint64_t reserve_weight_in = 50000;
 const uint64_t reserve_out = 125682033533;
+const uint64_t reserve_weight_out = 50000;
 const uint8_t fee = 30;
 
 // Calculation
-const uint64_t amount_in = balancer::get_amount_in( amount_out, reserve_in, reserve_out, fee );
+const uint64_t amount_in = balancer::get_amount_in( amount_out, reserve_in, reserve_weight_in, reserve_out, reserve_weight_out, fee );
 // => 10000
 ```
 
@@ -98,7 +109,9 @@ Given some amount of an asset and pair reserves, returns an equivalent amount of
 
 - `{uint64_t} amount_a` - amount A
 - `{uint64_t} reserve_a` - reserve A
+- `{uint64_t} reserve_weight_a` - reserve A weight
 - `{uint64_t} reserve_b` - reserve B
+- `{uint64_t} reserve_weight_b` - reserve B weight
 
 ### example
 
@@ -107,8 +120,10 @@ Given some amount of an asset and pair reserves, returns an equivalent amount of
 const uint64_t amount_a = 10000;
 const uint64_t reserve_a = 45851931234;
 const uint64_t reserve_b = 125682033533;
+const uint64_t reserve_weight_a = 50000;
+const uint64_t reserve_weight_b = 50000;
 
 // Calculation
-const uint64_t amountB = balancer::quote( amount_a, reserve_a, reserve_b );
+const uint64_t amount_b = balancer::quote( amount_a, reserve_a, reserve_weight_a, reserve_b, reserve_weight_b );
 // => 27410
 ```
