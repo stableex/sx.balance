@@ -1,4 +1,4 @@
-# **`EOSIO Balancer`**
+# **`Balancer`**
 
 [![Build Status](https://travis-ci.org/stableex/sx.balancer.svg?branch=master)](https://travis-ci.org/stableex/sx.balancer)
 
