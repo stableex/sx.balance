@@ -20,14 +20,25 @@ const uint64_t reserve_weight_out = 50000;
 const uint8_t fee = 30;
 
 // Calculation
-const uint64_t out = balancer::get_amount_out( amount_in, reserve_in, reserve_weight_in, reserve_out, reserve_weight_out, fee );
+const uint64_t out = balancer::get_amount_out( amount_in,
+                                               reserve_in,
+                                               reserve_weight_in,
+                                               reserve_out,
+                                               reserve_weight_out,
+                                               fee );
 // => 27328
 ```
 
 ## Pseudocode Price Formula
 
 ```c++
-function get_amount_out( amount_in, reserve_in, reserve_weight_in, reserve_out, reserve_weight_out, fee ) {
+function get_amount_out( amount_in,
+                         reserve_in,
+                         reserve_weight_in,
+                         reserve_out,
+                         reserve_weight_out,
+                         fee )
+{
     weight_ratio = (reserve_weight_in / reserve_weight_out);
     amount_in_with_fee = amount_in * (10000 - fee);
     numerator = (reserve_in * 10000) / ((reserve_in * 10000) + amount_in_with_fee)
