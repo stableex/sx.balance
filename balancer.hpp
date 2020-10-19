@@ -87,9 +87,10 @@ namespace balancer {
         eosio::check(amount_out > 0, "SX.Balancer: INSUFFICIENT_OUTPUT_AMOUNT");
         eosio::check(reserve_in > 0 && reserve_out > 0, "SX.Balancer: INSUFFICIENT_LIQUIDITY");
 
-        const uint128_t numerator = safemath::mul( safemath::mul( static_cast<uint128_t>(reserve_in), amount_out), 10000);
-        const uint128_t denominator = safemath::mul( safemath::sub(reserve_out, amount_out), (10000 - fee));
-        const uint64_t amount_in = safemath::add(numerator / denominator, 1);
+        const double weight_ratio = static_cast<double>(reserve_weight_in) / reserve_weight_out;
+        const double numerator = static_cast<double>(reserve_in) *  amount_out * 10000;
+        const double denominator = ((reserve_out - amount_out) * (10000 - fee)) * weight_ratio;
+        const uint64_t amount_in = 1 + ( numerator / denominator);
 
         return amount_in;
     }
