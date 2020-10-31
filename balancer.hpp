@@ -1,6 +1,6 @@
 #pragma once
 
-#include "safemath.hpp"
+#include <sx.safemath/safemath.hpp>
 #include <math.h>
 
 namespace balancer {
